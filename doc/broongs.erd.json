@@ -5,7 +5,7 @@
     "width": 2000,
     "height": 2000,
     "scrollTop": 0,
-    "scrollLeft": -90,
+    "scrollLeft": -1,
     "zoomLevel": 1,
     "show": 431,
     "database": 16,
@@ -95,7 +95,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1746114957274,
+          "updateAt": 1746120380324,
           "createAt": 1743139724085
         }
       },
@@ -215,8 +215,8 @@
       },
       "4Z5yl9EKpnY2TtCkIsOQK": {
         "id": "4Z5yl9EKpnY2TtCkIsOQK",
-        "name": "group",
-        "comment": "그룹",
+        "name": "team",
+        "comment": "팀",
         "columnIds": [
           "G5uBJ3PI3sCimL7W-IX9k",
           "xwRKG3Er0m1vqsvl7buXz",
@@ -237,14 +237,14 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1746114958442,
+          "updateAt": 1746120393378,
           "createAt": 1746112966982
         }
       },
       "vsepiNLS9cKx1rEJAN2yr": {
         "id": "vsepiNLS9cKx1rEJAN2yr",
-        "name": "member_group",
-        "comment": "멤버그룹",
+        "name": "member_team",
+        "comment": "멤버팀",
         "columnIds": [
           "e4TH3mIsjhXvgAFgBUQMx",
           "bPLOooBgSZpIf3yjo1xi2",
@@ -264,12 +264,12 @@
           "x": 689,
           "y": 39,
           "zIndex": 338,
-          "widthName": 84,
+          "widthName": 78,
           "widthComment": 60,
           "color": ""
         },
         "meta": {
-          "updateAt": 1746115712240,
+          "updateAt": 1746120388373,
           "createAt": 1746113110523
         }
       },
@@ -1167,7 +1167,7 @@
       "vS7_UjY7ITVneYu9YLYf7": {
         "id": "vS7_UjY7ITVneYu9YLYf7",
         "tableId": "vsepiNLS9cKx1rEJAN2yr",
-        "name": "group_id",
+        "name": "team_id",
         "comment": "그룹id",
         "dataType": "BIGINT",
         "default": "",
@@ -1180,7 +1180,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1746113186059,
+          "updateAt": 1746120404354,
           "createAt": 1746113182163
         }
       },
@@ -1240,7 +1240,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1746116594770,
+          "updateAt": 1746118162695,
           "createAt": 1746113363597
         }
       },
@@ -1367,7 +1367,7 @@
       "o13CFl2gaaKXw8rUerM70": {
         "id": "o13CFl2gaaKXw8rUerM70",
         "tableId": "rPiRaHvX00Ait79r9BWSE",
-        "name": "group_id",
+        "name": "team_id",
         "comment": "그룹id",
         "dataType": "BIGINT",
         "default": "",
@@ -1380,7 +1380,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1746113833522,
+          "updateAt": 1746120409066,
           "createAt": 1746113826652
         }
       },
@@ -1847,7 +1847,7 @@
       "-4RyV1UgQSdCxKBVm9qhi": {
         "id": "-4RyV1UgQSdCxKBVm9qhi",
         "tableId": "KZ1RHCaWf_Ef_GmKUn9Ly",
-        "name": "group_id",
+        "name": "team_id",
         "comment": "그룹id",
         "dataType": "BIGINT",
         "default": "",
@@ -1860,7 +1860,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1746115993637,
+          "updateAt": 1746120399614,
           "createAt": 1746115989780
         }
       },
@@ -2321,7 +2321,7 @@
       1743139724083,
       -1,
       {
-        "name": 1746112650649,
+        "name": 1746120380324,
         "comment": 1746112654669
       }
     ],
@@ -2684,8 +2684,8 @@
       1746112966981,
       -1,
       {
-        "name": 1746112981758,
-        "comment": 1746112983859
+        "name": 1746120393374,
+        "comment": 1746120390248
       }
     ],
     "G5uBJ3PI3sCimL7W-IX9k": [
@@ -2728,8 +2728,8 @@
       1746113110522,
       -1,
       {
-        "name": 1746113127175,
-        "comment": 1746113131624
+        "name": 1746120384585,
+        "comment": 1746120388372
       }
     ],
     "e4TH3mIsjhXvgAFgBUQMx": [
@@ -2804,7 +2804,7 @@
       -1,
       {
         "options(notNull)": 1746113182162,
-        "name": 1746113186057,
+        "name": 1746120404353,
         "dataType": 1746113182162,
         "default": 1746113182162,
         "comment": 1746113182162
@@ -2848,7 +2848,7 @@
       1746113363596,
       -1,
       {
-        "name": 1746113391683,
+        "name": 1746118162694,
         "comment": 1746113396180,
         "dataType": 1746116594770
       }
@@ -2923,7 +2923,7 @@
       -1,
       {
         "options(notNull)": 1746113826652,
-        "name": 1746113833522,
+        "name": 1746120409065,
         "dataType": 1746113826652,
         "default": 1746113826652,
         "comment": 1746113826652
@@ -3253,7 +3253,7 @@
       -1,
       {
         "options(notNull)": 1746115989778,
-        "name": 1746115993637,
+        "name": 1746120399613,
         "dataType": 1746115989778,
         "default": 1746115989778,
         "comment": 1746115989778
