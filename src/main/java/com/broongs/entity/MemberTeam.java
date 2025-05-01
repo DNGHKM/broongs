@@ -10,6 +10,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
+@Table(name = "member_team")
 public class MemberTeam {
     @Id
     @GeneratedValue

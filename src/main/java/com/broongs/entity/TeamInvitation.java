@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
+@Table(name = "team_invitation")
 public class TeamInvitation {
     @Id
     @GeneratedValue
