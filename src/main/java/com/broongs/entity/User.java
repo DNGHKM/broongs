@@ -1,12 +1,11 @@
 package com.broongs.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.broongs.dto.SignUpRequestDTO;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +13,8 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
-public class Member {
+@Table(name = "users")
+public class User {
     @Id
     @GeneratedValue
     private Long id;
@@ -42,7 +42,17 @@ public class Member {
 
     private LocalDateTime updateAt;
 
-    protected Member() {
+    protected User() {
     }
 
+    public static User singUp(SignUpRequestDTO dto, PasswordEncoder encoder) {
+        return User.builder()
+                .email(dto.getEmail())
+                .password(encoder.encode(dto.getPassword()))
+                .nickname(dto.getNickname())
+                .phone(dto.getPhone())
+                .createAt(LocalDateTime.now())
+                .updateAt(LocalDateTime.now())
+                .build();
+    }
 }

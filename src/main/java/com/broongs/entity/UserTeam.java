@@ -10,15 +10,15 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-@Table(name = "member_team")
-public class MemberTeam {
+@Table(name = "user_team")
+public class UserTeam {
     @Id
     @GeneratedValue
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id" , nullable = false)
@@ -29,7 +29,7 @@ public class MemberTeam {
     @Builder.Default
     private Role role = Role.MEMBER;
 
-    protected MemberTeam() {
+    protected UserTeam() {
 
     }
 }

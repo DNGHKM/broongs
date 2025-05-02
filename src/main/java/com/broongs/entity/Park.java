@@ -17,8 +17,8 @@ public class Park {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="member_id", nullable = false)
-    private Member member;
+    @JoinColumn(name="user_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="car_id", nullable = false)
