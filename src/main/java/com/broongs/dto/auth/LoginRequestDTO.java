@@ -1,4 +1,4 @@
-package com.broongs.dto;
+package com.broongs.dto.auth;
 
 import lombok.Getter;
 

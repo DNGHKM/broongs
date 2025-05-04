@@ -1,6 +1,6 @@
 package com.broongs.entity;
 
-import com.broongs.dto.SignUpRequestDTO;
+import com.broongs.dto.auth.SignUpRequestDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

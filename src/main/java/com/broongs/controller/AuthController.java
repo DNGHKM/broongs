@@ -1,7 +1,7 @@
 package com.broongs.controller;
 
-import com.broongs.dto.LoginRequestDTO;
-import com.broongs.dto.SignUpRequestDTO;
+import com.broongs.dto.auth.LoginRequestDTO;
+import com.broongs.dto.auth.SignUpRequestDTO;
 import com.broongs.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
