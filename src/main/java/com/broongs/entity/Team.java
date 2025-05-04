@@ -1,5 +1,6 @@
 package com.broongs.entity;
 
+import com.broongs.dto.team.UpdateTeamRequestDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +24,20 @@ public class Team {
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 
-    public Team() {
+    protected Team() {
+    }
+
+    public static Team makeNewTeam(String teamName) {
+        return Team.builder()
+                .name(teamName)
+                .build();
+    }
+
+    public void deleteTeam() {
+        this.deleted = true;
+    }
+
+    public void updateTeam(UpdateTeamRequestDTO dto) {
+        this.name = dto.getTeamName();
     }
 }
