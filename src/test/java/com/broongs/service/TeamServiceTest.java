@@ -8,9 +8,7 @@ import com.broongs.entity.Team;
 import com.broongs.entity.User;
 import com.broongs.enums.Role;
 import com.broongs.repository.TeamRepository;
-import com.broongs.repository.UserRepository;
 import com.broongs.repository.UserTeamRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +16,6 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,8 +30,6 @@ class TeamServiceTest {
     private TeamRepository teamRepository;
     @Mock
     private UserTeamRepository userTeamRepository;
-    @Mock
-    private UserRepository userRepository;
 
     @Mock
     private UserService userService;

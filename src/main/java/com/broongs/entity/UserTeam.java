@@ -21,7 +21,7 @@ public class UserTeam {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id" , nullable = false)
+    @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
     @Enumerated(EnumType.STRING)
@@ -31,5 +31,12 @@ public class UserTeam {
 
     protected UserTeam() {
 
+    }
+
+    public static UserTeam madeByOwner(User user, Team team) {
+        return UserTeam.builder()
+                .team(team)
+                .user(user)
+                .role(Role.OWNER).build();
     }
 }
