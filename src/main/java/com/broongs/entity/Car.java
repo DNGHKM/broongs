@@ -1,5 +1,6 @@
 package com.broongs.entity;
 
+import com.broongs.dto.car.AddCarRequestDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +34,7 @@ public class Car {
 
     private Integer fuelLevel;
 
-    @Column(name="img_uuid", length = 36)
+    @Column(name = "img_uuid", length = 36)
     private String imageUUID;
 
     @Column(nullable = false)
@@ -42,8 +43,20 @@ public class Car {
     @Column(nullable = false)
     private LocalDateTime updateAt;
 
-    public Car() {
-
+    protected Car() {
     }
 
+    public static Car addCar(Team team, AddCarRequestDTO dto, String imageUUID) {
+        return Car.builder()
+                .team(team)
+                .number(dto.getNumber())
+                .model(dto.getModel())
+                .color(dto.getColor())
+                .mileage(dto.getMileage())
+                .fuelLevel(dto.getFuelLevel())
+                .imageUUID(imageUUID)
+                .available(true)
+                .updateAt(LocalDateTime.now())
+                .build();
+    }
 }

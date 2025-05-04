@@ -6,11 +6,9 @@ import com.broongs.entity.User;
 import com.broongs.entity.UserTeam;
 import com.broongs.enums.Role;
 import com.broongs.repository.TeamRepository;
-import com.broongs.repository.UserRepository;
 import com.broongs.repository.UserTeamRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,5 +62,10 @@ public class TeamService {
         String beforeTeamName = team.getName();
         team.updateTeam(dto);
         return new UpdateTeamResponseDTO(team.getId(), beforeTeamName, team.getName());
+    }
+
+    public Team validateUserHasAccessAndGetTeam(String email, Long teamId) {
+        return teamRepository.findTeamByIdAndUserEmail(email, teamId)
+                .orElseThrow(() -> new EntityNotFoundException("권한이 존재하지 않거나 팀이 없습니다."));
     }
 }
