@@ -23,10 +23,10 @@ import java.util.stream.Collectors;
 public class TeamService {
     private final TeamRepository teamRepository;
     private final UserTeamRepository userTeamRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     public List<UserTeamListResponseDTO> getUserTeamList(String username) {
-        User user = getUser(username);
+        User user = userService.findUserByEmail(username);
         return teamRepository.getUserTeamList(user.getId()).stream()
                 .map(t -> new UserTeamListResponseDTO(t.getId(), t.getName()))
                 .collect(Collectors.toList());
@@ -34,7 +34,7 @@ public class TeamService {
 
     public MakeTeamResponseDTO addTeam(String email, MakeTeamRequestDTO dto) {
         Team team = Team.makeNewTeam(dto.getTeamName());
-        User user = getUser(email);
+        User user = userService.findUserByEmail(email);
         UserTeam userTeam = UserTeam.madeByOwner(user, team);
 
         teamRepository.save(team);
@@ -44,7 +44,7 @@ public class TeamService {
     }
 
     public DeleteTeamResponseDTO deleteTeam(String email, Long teamId) {
-        User user = getUser(email);
+        User user = userService.findUserByEmail(email);
         if (userTeamRepository.findUserRole(teamId, user.getId()) != Role.OWNER) {
             throw new RuntimeException("권한없음");
         }
@@ -55,7 +55,7 @@ public class TeamService {
     }
 
     public UpdateTeamResponseDTO updateTeam(Long teamId, UpdateTeamRequestDTO dto, String email) {
-        User user = getUser(email);
+        User user = userService.findUserByEmail(email);
         if (userTeamRepository.findUserRole(teamId, user.getId()) != Role.OWNER) {
             throw new RuntimeException("권한없음");
         }
@@ -64,10 +64,5 @@ public class TeamService {
         String beforeTeamName = team.getName();
         team.updateTeam(dto);
         return new UpdateTeamResponseDTO(team.getId(), beforeTeamName, team.getName());
-    }
-
-    private User getUser(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("유저 못찾음"));
     }
 }

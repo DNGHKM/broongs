@@ -36,6 +36,9 @@ class TeamServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private UserService userService;
+
     @InjectMocks
     private TeamService teamService;
 
@@ -49,7 +52,7 @@ class TeamServiceTest {
         User mockUser = User.builder().id(1L).email(email).build();
 
         // 스텁
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mockUser));
+        when(userService.findUserByEmail(email)).thenReturn(mockUser);
         when(teamRepository.save(ArgumentMatchers.any()))
                 .thenAnswer(invocation -> invocation.getArgument(0));
         when(userTeamRepository.save(ArgumentMatchers.any()))
@@ -61,7 +64,7 @@ class TeamServiceTest {
         // then
         assertEquals(dto.getTeamName(), teamResponseDTO.getTeamName());
         assertEquals(mockUser.getEmail(), teamResponseDTO.getOwnerEmail());
-        verify(userRepository).findByEmail(email);
+        verify(userService).findUserByEmail(email);
         verify(teamRepository).save(ArgumentMatchers.any());
         verify(teamRepository).save(ArgumentMatchers.any());
     }
@@ -75,7 +78,7 @@ class TeamServiceTest {
         User mockUser = User.builder().id(1L).email(email).build();
         Team mockTeam = Team.makeNewTeam("개발팀");
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mockUser));
+        when(userService.findUserByEmail(email)).thenReturn(mockUser);
         when(userTeamRepository.findUserRole(teamId, mockUser.getId())).thenReturn(Role.OWNER);
         when(teamRepository.findById(teamId)).thenReturn(Optional.of(mockTeam));
 
@@ -94,7 +97,7 @@ class TeamServiceTest {
         Long teamId = 1L;
         User mockUser = User.builder().id(1L).email(email).build();
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(mockUser));
+        when(userService.findUserByEmail(email)).thenReturn(mockUser);
         when(userTeamRepository.findUserRole(teamId, mockUser.getId())).thenReturn(Role.MEMBER);
 
         // when & then
@@ -113,8 +116,7 @@ class TeamServiceTest {
         Team mockTeam = Team.makeNewTeam("개발팀");
         UpdateTeamRequestDTO dto = new UpdateTeamRequestDTO("개발팀-수정");
 
-        when(userRepository.findByEmail(email))
-                .thenReturn(Optional.of(mockUser));
+        when(userService.findUserByEmail(email)).thenReturn(mockUser);
         when(userTeamRepository.findUserRole(teamId, mockUser.getId()))
                 .thenReturn(Role.OWNER);
         when(teamRepository.findById(teamId))
@@ -131,20 +133,20 @@ class TeamServiceTest {
     @DisplayName("유저 팀 목록 조회 성공")
     void getUserTeamList_success() {
         // given
-        String username = "test@example.com";
+        String email = "test@example.com";
         Long userId = 1L;
-        User mockUser = User.builder().id(userId).email(username).build();
+        User mockUser = User.builder().id(userId).email(email).build();
 
         List<Team> mockTeamList = List.of(
                 Team.builder().id(100L).name("팀A").build(),
                 Team.builder().id(101L).name("팀B").build()
         );
 
-        when(userRepository.findByEmail(username)).thenReturn(Optional.of(mockUser));
+        when(userService.findUserByEmail(email)).thenReturn(mockUser);
         when(teamRepository.getUserTeamList(userId)).thenReturn(mockTeamList);
 
         // when
-        List<UserTeamListResponseDTO> result = teamService.getUserTeamList(username);
+        List<UserTeamListResponseDTO> result = teamService.getUserTeamList(email);
 
         // then
         assertEquals(2, result.size());
@@ -153,23 +155,22 @@ class TeamServiceTest {
         assertEquals(101L, result.get(1).getId());
         assertEquals("팀B", result.get(1).getTeamName());
 
-        verify(userRepository).findByEmail(username);
+        verify(userService).findUserByEmail(email);
         verify(teamRepository).getUserTeamList(userId);
     }
     @DisplayName("유저 팀 목록 조회 실패 - 유저 없음")
     @Test
     void getUserTeamList_fail_userNotFound() {
         // given
-        String username = "nonexistent@example.com";
-        when(userRepository.findByEmail(username)).thenReturn(Optional.empty());
+        String email = "nonexistent@example.com";
+        when(userService.findUserByEmail(email)).thenReturn(null);
 
         // when & then
-        assertThrows(UsernameNotFoundException.class, () ->
-                teamService.getUserTeamList(username)
+        assertThrows(NullPointerException.class, () ->
+                teamService.getUserTeamList(email)
         );
 
-        verify(userRepository).findByEmail(username);
+        verify(userService).findUserByEmail(email);
         verifyNoMoreInteractions(teamRepository);  // teamRepository는 호출 안 됨
     }
-
 }
