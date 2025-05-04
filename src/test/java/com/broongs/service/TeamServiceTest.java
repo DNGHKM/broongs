@@ -96,9 +96,7 @@ class TeamServiceTest {
         when(userTeamRepository.findUserRole(teamId, mockUser.getId())).thenReturn(Role.MEMBER);
 
         // when & then
-        assertThrows(RuntimeException.class, () -> {
-            teamService.deleteTeam(email, teamId);
-        });
+        assertThrows(RuntimeException.class, () -> teamService.deleteTeam(email, teamId));
     }
 
     @Test
