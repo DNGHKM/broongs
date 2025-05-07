@@ -1,7 +1,9 @@
 package com.broongs.service;
 
 import com.broongs.dto.auth.LoginRequestDTO;
+import com.broongs.dto.auth.LoginResponseDTO;
 import com.broongs.dto.auth.SignUpRequestDTO;
+import com.broongs.dto.auth.SignUpResponseDTO;
 import com.broongs.entity.User;
 import com.broongs.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +28,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final SecurityContextRepository securityContextRepository;
 
-    public String login(LoginRequestDTO loginDTO, HttpServletRequest request, HttpServletResponse response) {
+    public LoginResponseDTO login(LoginRequestDTO loginDTO, HttpServletRequest request, HttpServletResponse response) {
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword());
 
@@ -40,27 +42,16 @@ public class AuthService {
 
         HttpSession session = request.getSession(true);
 
-        return session.getId();
+        return new LoginResponseDTO(session.getId());
     }
 
 
-    public void register(SignUpRequestDTO signUpRequestDTO) {
+    public SignUpResponseDTO register(SignUpRequestDTO signUpRequestDTO) {
         if (userRepository.existsByEmail(signUpRequestDTO.getEmail())) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
         User user = User.singUp(signUpRequestDTO, passwordEncoder);
         userRepository.save(user);
+        return new SignUpResponseDTO(user.getEmail());
     }
-
-
-//    public void logout(HttpServletResponse response) {
-//        ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, "")
-//                .path("/")
-//                .maxAge(0)
-//                .httpOnly(true)
-//                .secure(COOKIE_SECURE) // HTTPS 적용 시 true
-//                .build();
-//
-//        response.addHeader("Set-Cookie", cookie.toString());
-//    }
 }

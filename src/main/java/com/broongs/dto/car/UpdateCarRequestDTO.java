@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddCarRequestDTO {
+public class UpdateCarRequestDTO {
     @NotNull
     private Long teamId;
 

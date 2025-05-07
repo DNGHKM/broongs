@@ -38,6 +38,7 @@ public class SecurityConfig {
                 );
         return http.build();
     }
+
     @Bean
     public SecurityContextRepository securityContextRepository() {
         return new HttpSessionSecurityContextRepository();

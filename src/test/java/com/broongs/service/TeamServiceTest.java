@@ -151,6 +151,7 @@ class TeamServiceTest {
         verify(userService).findUserByEmail(email);
         verify(teamRepository).getUserTeamList(userId);
     }
+
     @DisplayName("유저 팀 목록 조회 실패 - 유저 없음")
     @Test
     void getUserTeamList_fail_userNotFound() {

@@ -1,6 +1,7 @@
 package com.broongs.entity;
 
 import com.broongs.dto.car.AddCarRequestDTO;
+import com.broongs.dto.car.UpdateCarRequestDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +35,7 @@ public class Car {
 
     private Integer fuelLevel;
 
-    @Column(name = "img_uuid", length = 36)
+    @Column(name = "img_uuid", length = 50)
     private String imageUUID;
 
     @Column(nullable = false)
@@ -58,5 +59,20 @@ public class Car {
                 .available(true)
                 .updateAt(LocalDateTime.now())
                 .build();
+    }
+
+    public void update(UpdateCarRequestDTO dto, Team team, String imageUUID) {
+        this.team = team;
+        this.number = dto.getNumber();
+        this.model = dto.getModel();
+        this.color = dto.getColor();
+        this.mileage = dto.getMileage();
+        this.fuelLevel = dto.getFuelLevel();
+        this.imageUUID = imageUUID;
+        this.updateAt = LocalDateTime.now();
+    }
+
+    public void disabled() {
+        this.available = false;
     }
 }

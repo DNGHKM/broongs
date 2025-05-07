@@ -68,4 +68,8 @@ public class TeamService {
         return teamRepository.findTeamByIdAndUserEmail(email, teamId)
                 .orElseThrow(() -> new EntityNotFoundException("권한이 존재하지 않거나 팀이 없습니다."));
     }
+
+    public Role getUserRoleOfTeam(String email, Long teamId) {
+        return teamRepository.findUserRoleOfTeam(email, teamId);
+    }
 }

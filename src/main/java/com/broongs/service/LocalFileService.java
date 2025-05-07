@@ -30,9 +30,12 @@ public class LocalFileService implements FileService {
 
     @Override
     public String uploadFile(MultipartFile file, String subDirectory) {
+        String originalFilename = file.getOriginalFilename();
         String fileUUID = String.valueOf(UUID.randomUUID());
+        String ext = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String fullFileName = fileUUID + ext;
 
-        Path filePath = Paths.get(BASE_DIR, subDirectory, fileUUID);
+        Path filePath = Paths.get(BASE_DIR, subDirectory, fullFileName);
         try {
             Files.createDirectories(filePath.getParent());
 
@@ -41,7 +44,7 @@ public class LocalFileService implements FileService {
                     .outputQuality(0.9)
                     .toFile(filePath.toFile());
 
-            return fileUUID;
+            return fullFileName;
         } catch (IOException e) {
             log.error("File upload failed: " + e.getMessage());
             throw new RuntimeException("File upload failed", e);

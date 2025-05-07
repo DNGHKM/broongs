@@ -1,6 +1,7 @@
 package com.broongs.repository;
 
 import com.broongs.entity.Team;
+import com.broongs.enums.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,4 +24,7 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
 
     @Query("SELECT ut.team FROM UserTeam ut WHERE ut.team.id = :teamId AND ut.user.email = :email AND ut.team.deleted = false")
     Optional<Team> findTeamByIdAndUserEmail(@Param("email") String email, @Param("teamId") Long teamId);
+
+    @Query("SELECT ut.role FROM UserTeam ut WHERE ut.team.id = :teamId AND ut.user.email = :email AND ut.team.deleted = false")
+    Role findUserRoleOfTeam(String email, Long teamId);
 }
