@@ -38,7 +38,7 @@ public class TeamService {
         teamRepository.save(team);
         userTeamRepository.save(userTeam);
 
-        return new MakeTeamResponseDTO(team.getId(), team.getName(), email);
+        return MakeTeamResponseDTO.from(team);
     }
 
     public DeleteTeamResponseDTO deleteTeam(String email, Long teamId) {
@@ -59,9 +59,8 @@ public class TeamService {
         }
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new EntityNotFoundException("팀 없음"));
-        String beforeTeamName = team.getName();
         team.updateTeam(dto);
-        return new UpdateTeamResponseDTO(team.getId(), beforeTeamName, team.getName());
+        return UpdateTeamResponseDTO.from(team);
     }
 
     public Team validateUserHasAccessAndGetTeam(String email, Long teamId) {
