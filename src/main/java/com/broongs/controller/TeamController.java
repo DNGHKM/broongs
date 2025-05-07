@@ -5,6 +5,7 @@ import com.broongs.dto.car.CarListResponseDTO;
 import com.broongs.dto.team.*;
 import com.broongs.service.CarService;
 import com.broongs.service.TeamService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -55,7 +56,7 @@ public class TeamController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse> makeTeam(@RequestBody MakeTeamRequestDTO dto,
+    public ResponseEntity<ApiResponse> makeTeam(@RequestBody @Valid MakeTeamRequestDTO dto,
                                                 @AuthenticationPrincipal UserDetails userDetails) {
         try {
             MakeTeamResponseDTO makeTeamResponseDTO = teamService.addTeam(userDetails.getUsername(), dto);
@@ -89,7 +90,7 @@ public class TeamController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse> updateTeam(@PathVariable Long id,
-                                                  @RequestBody UpdateTeamRequestDTO dto,
+                                                  @RequestBody @Valid UpdateTeamRequestDTO dto,
                                                   @AuthenticationPrincipal UserDetails userDetails) {
         try {
             UpdateTeamResponseDTO updateTeamResponseDTO = teamService.updateTeam(id, dto, userDetails.getUsername());
