@@ -6,6 +6,7 @@ import com.broongs.entity.Team;
 import com.broongs.enums.Role;
 import com.broongs.repository.CarRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,11 +25,19 @@ public class CarService {
     private final CarRepository carRepository;
     private final String FILE_DIR = "/car";
 
+    public CarInfoResponseDTO getCarInfo(String email, Long id) {
+        Car car = carRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("차량 정보 조회 불가능"));
+        teamService.validateAccessToTeam(email, car.getTeam().getId());
+
+        return CarInfoResponseDTO.from(car);
+    }
+
     public AddCarResponseDTO addCar(String email, AddCarRequestDTO dto) {
         validateManagePermission(email, dto.getTeamId());
-        validateCarNumberDuplicate(dto.getNumber());
+        validateCarNumberDuplicate(dto.getNumber(), dto.getTeamId());
 
-        Team team = teamService.validateUserHasAccessAndGetTeam(email, dto.getTeamId());
+        Team team = teamService.validateAndGetTeam(email, dto.getTeamId());
 
         String fileUUID = uploadCarImage(dto.getCarImage(), null);
         Car car = carRepository.save(Car.addCar(team, dto, fileUUID));
@@ -37,9 +46,9 @@ public class CarService {
 
     public UpdateCarResponseDTO updateCar(Long id, String email, UpdateCarRequestDTO dto) {
         validateManagePermission(email, dto.getTeamId());
-        validateCarNumberDuplicate(dto.getNumber());
+        validateCarNumberDuplicate(dto.getNumber(), dto.getTeamId());
 
-        Team team = teamService.validateUserHasAccessAndGetTeam(email, dto.getTeamId());
+        Team team = teamService.validateAndGetTeam(email, dto.getTeamId());
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("차량 없음"));
 
@@ -50,7 +59,7 @@ public class CarService {
     }
 
     public List<CarListResponseDTO> getCarListByTeam(Long teamId, String email) {
-        Team team = teamService.validateUserHasAccessAndGetTeam(email, teamId);
+        Team team = teamService.validateAndGetTeam(email, teamId);
         return carRepository.findCarsByTeam(team).stream()
                 .map(car -> CarListResponseDTO.from(car, teamId))
                 .collect(Collectors.toList());
@@ -63,8 +72,8 @@ public class CarService {
         }
     }
 
-    private void validateCarNumberDuplicate(String dto) {
-        carRepository.findCarByNumber(dto)
+    private void validateCarNumberDuplicate(String dto, @NotNull Long teamId) {
+        carRepository.findCarByNumberAndTeamId(dto, teamId)
                 .ifPresent(c -> {
                     throw new RuntimeException("차량 번호 중복입니다.");
                 });

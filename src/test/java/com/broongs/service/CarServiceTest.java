@@ -2,6 +2,7 @@ package com.broongs.service;
 
 import com.broongs.dto.car.AddCarRequestDTO;
 import com.broongs.dto.car.AddCarResponseDTO;
+import com.broongs.dto.car.CarInfoResponseDTO;
 import com.broongs.dto.car.UpdateCarRequestDTO;
 import com.broongs.entity.Car;
 import com.broongs.entity.Team;
@@ -31,24 +32,96 @@ class CarServiceTest {
     private CarService carService;
 
     @Test
-    @DisplayName("차량등록 - 성공")
+    @DisplayName("차량 조회 - 성공")
+    void getCarInfo_success() {
+        //given
+        String email = "test@test.com";
+        Long carId = 1L;
+
+        Team team = Team.builder()
+                .id(2L)
+                .name("팀1")
+                .deleted(false)
+                .build();
+
+        Car car = Car.builder()
+                .id(carId)
+                .team(team)
+                .number("123가1234")
+                .model("싼타페")
+                .color("흰색")
+                .mileage(10000L)
+                .fuelLevel(50)
+                .imageUUID("image.jpg")
+                .available(true)
+                .team(team)
+                .build();
+
+        when(carRepository.findById(carId)).thenReturn(Optional.of(car));
+        doNothing().when(teamService).validateAccessToTeam(email, car.getTeam().getId());
+        //when
+        CarInfoResponseDTO carInfo = carService.getCarInfo(email, carId);
+
+        //then
+        assertEquals(carInfo.getId(), car.getId());
+        assertEquals(carInfo.getNumber(), car.getNumber());
+    }
+
+    @Test
+    @DisplayName("차량 조회 - 실패(팀 권한 없음)")
+    void getCarInfo_fail_invalid_team() {
+        //given
+        String email = "test@test.com";
+        Long carId = 1L;
+
+        Team team = Team.builder()
+                .id(2L)
+                .name("팀1")
+                .deleted(false)
+                .build();
+
+        Car car = Car.builder()
+                .id(carId)
+                .team(team)
+                .number("123가1234")
+                .model("싼타페")
+                .color("흰색")
+                .mileage(10000L)
+                .fuelLevel(50)
+                .imageUUID("image.jpg")
+                .available(true)
+                .team(team)
+                .build();
+
+        when(carRepository.findById(carId)).thenReturn(Optional.of(car));
+        doThrow(new RuntimeException("권한 없음"))
+                .when(teamService).validateAccessToTeam(email, car.getTeam().getId());
+
+
+        //when & then
+        assertThrows(RuntimeException.class, () -> carService.getCarInfo(email, carId));
+    }
+
+    @Test
+    @DisplayName("차량 등록 - 성공")
     void carAdd_success() {
         //given
         String email = "test@test.com";
+        Long teamId = 1L;
 
-        AddCarRequestDTO requestDTO = new AddCarRequestDTO(1L,
+        AddCarRequestDTO requestDTO = new AddCarRequestDTO(teamId,
                 "123가1234",
                 "싼타페",
                 "흰색",
                 12000L,
                 60,
                 null);
-        Team team = Team.builder().id(10L)
+        Team team = Team.builder().id(teamId)
                 .name("팀1")
                 .deleted(false).build();
-        when(teamService.validateUserHasAccessAndGetTeam(email, requestDTO.getTeamId())).thenReturn(team);
+        when(teamService.validateAndGetTeam(email, requestDTO.getTeamId())).thenReturn(team);
         when(teamService.getUserRoleOfTeam(email, requestDTO.getTeamId())).thenReturn(Role.MANAGER);
-        when(carRepository.findCarByNumber(requestDTO.getNumber())).thenReturn(Optional.empty());
+        when(carRepository.findCarByNumberAndTeamId(requestDTO.getNumber(), team.getId())).thenReturn(Optional.empty());
 
         Car car = Car.addCar(team, requestDTO, null);
         when(carRepository.save(ArgumentMatchers.any(Car.class)))
@@ -61,44 +134,46 @@ class CarServiceTest {
         assertEquals(car.getId(), responseDTO.getId());
         assertEquals(requestDTO.getNumber(), responseDTO.getNumber());
 
-        verify(teamService).validateUserHasAccessAndGetTeam(email, requestDTO.getTeamId());
-        verify(carRepository).findCarByNumber(ArgumentMatchers.any());
+        verify(teamService).validateAndGetTeam(email, requestDTO.getTeamId());
+        verify(carRepository).findCarByNumberAndTeamId(ArgumentMatchers.any(), ArgumentMatchers.any());
     }
 
     @Test
-    @DisplayName("차량등록 - 실패(이미 같은 번호 있음)")
+    @DisplayName("차량 등록 - 실패(이미 동일 팀에 같은 번호 있음)")
     void carAdd_fail_duplicate_number() {
         //given
         String email = "test@test.com";
 
-        AddCarRequestDTO requestDTO = new AddCarRequestDTO(1L,
+        AddCarRequestDTO requestDTO = new AddCarRequestDTO(10L,
                 "123가1234",
                 "싼타페",
                 "흰색",
                 12000L,
                 60,
                 null);
+
         Team team = Team.builder().id(10L)
                 .name("팀1")
                 .deleted(false).build();
 
         Car duplicatedCar = Car.builder()
                 .id(99L)
+                .team(team)
                 .number(requestDTO.getNumber())
                 .build();
 
 
-        when(teamService.validateUserHasAccessAndGetTeam(email, requestDTO.getTeamId())).thenReturn(team);
         when(teamService.getUserRoleOfTeam(email, requestDTO.getTeamId())).thenReturn(Role.MANAGER);
-        when(carRepository.findCarByNumber(requestDTO.getNumber())).thenReturn(Optional.ofNullable(duplicatedCar));
+        when(carRepository.findCarByNumberAndTeamId(requestDTO.getNumber(), team.getId())).thenReturn(Optional.of(duplicatedCar));
 
         // when/then
         assertThrows(RuntimeException.class, () -> carService.addCar(email, requestDTO));
         verifyNoMoreInteractions(carRepository);
+        verifyNoMoreInteractions(teamService);
     }
 
     @Test
-    @DisplayName("차량등록 - 실패(소속 팀이 아님)")
+    @DisplayName("차량 등록 - 실패(소속 팀이 아님)")
     void carAdd_fail_no_team() {
         //given
         String email = "test@test.com";
@@ -118,7 +193,7 @@ class CarServiceTest {
     }
 
     @Test
-    @DisplayName("차량등록 - 실패(권한이 없음)")
+    @DisplayName("차량 등록 - 실패(권한이 없음)")
     void carAdd_fail_invalid_role() {
         //given
         String email = "test@test.com";
@@ -166,7 +241,7 @@ class CarServiceTest {
                 .deleted(false).build();
 
         when(teamService.getUserRoleOfTeam(email, requestDTO.getTeamId())).thenReturn(Role.MANAGER);
-        when(teamService.validateUserHasAccessAndGetTeam(email, requestDTO.getTeamId())).thenReturn(team);
+        when(teamService.validateAndGetTeam(email, requestDTO.getTeamId())).thenReturn(team);
         when(carRepository.findById(id)).thenReturn(Optional.of(car));
 
         //when

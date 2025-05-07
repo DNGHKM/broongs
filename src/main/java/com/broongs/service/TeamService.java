@@ -63,8 +63,14 @@ public class TeamService {
         return UpdateTeamResponseDTO.from(team);
     }
 
-    public Team validateUserHasAccessAndGetTeam(String email, Long teamId) {
-        return teamRepository.findTeamByIdAndUserEmail(email, teamId)
+    public void validateAccessToTeam(String email, Long teamId) {
+        if (!teamRepository.existsByUserEmailAndTeamId(email, teamId)) {
+            throw new RuntimeException("팀 접근 권한이 없습니다.");
+        }
+    }
+
+    public Team validateAndGetTeam(String email, Long teamId) {
+        return teamRepository.findAccessibleTeam(email, teamId)
                 .orElseThrow(() -> new EntityNotFoundException("권한이 존재하지 않거나 팀이 없습니다."));
     }
 

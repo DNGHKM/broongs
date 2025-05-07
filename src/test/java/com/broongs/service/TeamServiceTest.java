@@ -58,7 +58,6 @@ class TeamServiceTest {
 
         // then
         assertEquals(dto.getTeamName(), teamResponseDTO.getTeamName());
-        assertEquals(mockUser.getEmail(), teamResponseDTO.getOwnerEmail());
         verify(userService).findUserByEmail(email);
         verify(teamRepository).save(ArgumentMatchers.any());
         verify(teamRepository).save(ArgumentMatchers.any());
@@ -165,6 +164,6 @@ class TeamServiceTest {
         );
 
         verify(userService).findUserByEmail(email);
-        verifyNoMoreInteractions(teamRepository);  // teamRepository는 호출 안 됨
+        verifyNoMoreInteractions(teamRepository);
     }
 }

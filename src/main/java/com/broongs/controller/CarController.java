@@ -1,10 +1,7 @@
 package com.broongs.controller;
 
 import com.broongs.dto.ApiResponse;
-import com.broongs.dto.car.AddCarRequestDTO;
-import com.broongs.dto.car.AddCarResponseDTO;
-import com.broongs.dto.car.UpdateCarRequestDTO;
-import com.broongs.dto.car.UpdateCarResponseDTO;
+import com.broongs.dto.car.*;
 import com.broongs.service.CarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +19,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/cars")
 public class CarController {
     private final CarService carService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse> getCarInfo(@PathVariable Long id,
+                                                  @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            CarInfoResponseDTO carInfoDTO = carService.getCarInfo(userDetails.getUsername(), id);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(ApiResponse.success("차량을 조회하였습니다.", carInfoDTO));
+        } catch (Exception e) {
+            log.error("error = {}", e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.failure("차량 조회에 실패하였습니다." + e.getMessage()));
+        }
+    }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse> addCar(@ModelAttribute @Valid AddCarRequestDTO dto,

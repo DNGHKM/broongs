@@ -20,11 +20,32 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
                 and t.deleted = false
             order by t.name
             """)
-    List<Team> getUserTeamList(Long userId);
+    List<Team> getUserTeamList(@Param("userId") Long userId);
 
-    @Query("SELECT ut.team FROM UserTeam ut WHERE ut.team.id = :teamId AND ut.user.email = :email AND ut.team.deleted = false")
-    Optional<Team> findTeamByIdAndUserEmail(@Param("email") String email, @Param("teamId") Long teamId);
+    @Query("""
+            SELECT ut.team
+            FROM UserTeam ut
+            WHERE ut.team.id = :teamId
+            AND ut.user.email = :email
+            AND ut.team.deleted = false
+            """)
+    Optional<Team> findAccessibleTeam(@Param("email") String email, @Param("teamId") Long teamId);
 
-    @Query("SELECT ut.role FROM UserTeam ut WHERE ut.team.id = :teamId AND ut.user.email = :email AND ut.team.deleted = false")
-    Role findUserRoleOfTeam(String email, Long teamId);
+    @Query("""
+            SELECT ut.role
+            FROM UserTeam ut
+            WHERE ut.team.id = :teamId
+            AND ut.user.email = :email
+            AND ut.team.deleted = false
+            """)
+    Role findUserRoleOfTeam(@Param("email") String email, @Param("teamId") Long teamId);
+
+    @Query("""
+            SELECT COUNT(ut) > 0
+            FROM UserTeam ut
+            WHERE ut.user.email = :email
+              AND ut.team.id = :teamId
+              AND ut.team.deleted = false
+            """)
+    boolean existsByUserEmailAndTeamId(@Param("email") String email, @Param("teamId") Long teamId);
 }
