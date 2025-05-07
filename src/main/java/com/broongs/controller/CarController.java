@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/car")
+@RequestMapping("/api/cars")
 public class CarController {
     private final CarService carService;
 
@@ -46,7 +46,7 @@ public class CarController {
         try {
             UpdateCarResponseDTO updateCarResponseDTO = carService.updateCar(id, userDetails.getUsername(), dto);
             return ResponseEntity
-                    .status(HttpStatus.CREATED)
+                    .status(HttpStatus.OK)
                     .body(ApiResponse.success("차량을 수정하였습니다.", updateCarResponseDTO));
         } catch (Exception e) {
             log.error("error = {}", e.getMessage());
