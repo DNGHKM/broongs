@@ -48,7 +48,7 @@ public class TeamService {
         }
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new EntityNotFoundException("팀 없음"));
-        team.deleteTeam();
+        team.delete();
         return new DeleteTeamResponseDTO(team.getId());
     }
 

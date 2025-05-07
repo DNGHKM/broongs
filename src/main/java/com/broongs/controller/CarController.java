@@ -68,4 +68,20 @@ public class CarController {
                     .body(ApiResponse.failure("차량 수정에 실패하였습니다." + e.getMessage()));
         }
     }
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<ApiResponse> deleteCar(@PathVariable Long id,
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            carService.deleteCar(id, userDetails.getUsername());
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(ApiResponse.success("차량을 삭제하였습니다.", id));
+        } catch (Exception e) {
+            log.error("error = {}", e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.failure("차량 삭제를 실패하였습니다." + e.getMessage()));
+        }
+    }
+    //TODO 비활성화 구현
 }

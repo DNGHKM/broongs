@@ -15,9 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class UpdateCarRequestDTO {
     @NotNull
-    private Long teamId;
-
-    @NotNull
     private String number;
 
     private String model;

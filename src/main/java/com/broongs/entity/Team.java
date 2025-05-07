@@ -33,7 +33,7 @@ public class Team {
                 .build();
     }
 
-    public void deleteTeam() {
+    public void delete() {
         this.deleted = true;
     }
 

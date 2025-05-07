@@ -26,7 +26,7 @@ public class CarService {
     private final String FILE_DIR = "/car";
 
     public CarInfoResponseDTO getCarInfo(String email, Long id) {
-        Car car = carRepository.findById(id)
+        Car car = carRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new EntityNotFoundException("차량 정보 조회 불가능"));
         teamService.validateAccessToTeam(email, car.getTeam().getId());
 
@@ -45,16 +45,16 @@ public class CarService {
     }
 
     public UpdateCarResponseDTO updateCar(Long id, String email, UpdateCarRequestDTO dto) {
-        validateManagePermission(email, dto.getTeamId());
-        validateCarNumberDuplicate(dto.getNumber(), dto.getTeamId());
-
-        Team team = teamService.validateAndGetTeam(email, dto.getTeamId());
-        Car car = carRepository.findById(id)
+        Car car = carRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new EntityNotFoundException("차량 없음"));
+        Long teamId = car.getTeam().getId();
+
+        validateManagePermission(email, teamId);
+        validateCarNumberDuplicate(dto.getNumber(), teamId);
 
         String fileUUID = uploadCarImage(dto.getCarImage(), car.getImageUUID());
 
-        car.update(dto, team, fileUUID);
+        car.update(dto, fileUUID);
         return UpdateCarResponseDTO.from(car);
     }
 
@@ -65,15 +65,22 @@ public class CarService {
                 .collect(Collectors.toList());
     }
 
-    private void validateManagePermission(String email, Long dto) {
-        Role role = teamService.getUserRoleOfTeam(email, dto);
+    public void deleteCar(Long id, String email) {
+        Car car = carRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new EntityNotFoundException("차량 없음"));
+        validateManagePermission(email, car.getTeam().getId());
+        car.delete();
+    }
+
+    private void validateManagePermission(String email, Long teamId) {
+        Role role = teamService.getUserRoleOfTeam(email, teamId);
         if (role != Role.OWNER && role != Role.MANAGER) {
             throw new RuntimeException("권한이 없습니다.");
         }
     }
 
-    private void validateCarNumberDuplicate(String dto, @NotNull Long teamId) {
-        carRepository.findCarByNumberAndTeamId(dto, teamId)
+    private void validateCarNumberDuplicate(String number, @NotNull Long teamId) {
+        carRepository.findCarByNumberAndTeamId(number, teamId)
                 .ifPresent(c -> {
                     throw new RuntimeException("차량 번호 중복입니다.");
                 });

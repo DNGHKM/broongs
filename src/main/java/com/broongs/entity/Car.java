@@ -41,6 +41,9 @@ public class Car {
     @Column(nullable = false)
     private boolean available = true;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean deleted;
+
     @Column(nullable = false)
     private LocalDateTime updateAt;
 
@@ -57,12 +60,12 @@ public class Car {
                 .fuelLevel(dto.getFuelLevel())
                 .imageUUID(imageUUID)
                 .available(true)
+                .deleted(false)
                 .updateAt(LocalDateTime.now())
                 .build();
     }
 
-    public void update(UpdateCarRequestDTO dto, Team team, String imageUUID) {
-        this.team = team;
+    public void update(UpdateCarRequestDTO dto, String imageUUID) {
         this.number = dto.getNumber();
         this.model = dto.getModel();
         this.color = dto.getColor();
@@ -74,5 +77,9 @@ public class Car {
 
     public void disabled() {
         this.available = false;
+    }
+
+    public void delete() {
+        this.deleted = true;
     }
 }
