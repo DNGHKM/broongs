@@ -3,7 +3,6 @@ package com.broongs.service;
 import com.broongs.dto.car.*;
 import com.broongs.entity.Car;
 import com.broongs.entity.Team;
-import com.broongs.enums.Role;
 import com.broongs.repository.CarRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -27,6 +26,12 @@ public class CarService {
     private final String FILE_DIR = "/car";
 
     @Transactional(readOnly = true)
+    public Car findUndeletedCarById(Long id) {
+        return carRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new EntityNotFoundException("차량 없음"));
+    }
+
+    @Transactional(readOnly = true)
     public CarInfoResponseDTO getCarInfo(String email, Long id) {
         Car car = carRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new EntityNotFoundException("차량 정보 조회 불가능"));
@@ -36,7 +41,7 @@ public class CarService {
     }
 
     public AddCarResponseDTO addCar(String email, AddCarRequestDTO dto) {
-        validateManagePermission(email, dto.getTeamId());
+        teamService.validateManagePermission(email, dto.getTeamId());
         validateCarNumberDuplicate(dto.getNumber(), dto.getTeamId());
 
         Team team = teamService.validateAndGetTeam(email, dto.getTeamId());
@@ -47,11 +52,10 @@ public class CarService {
     }
 
     public UpdateCarResponseDTO updateCar(Long id, String email, UpdateCarRequestDTO dto) {
-        Car car = carRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new EntityNotFoundException("차량 없음"));
+        Car car = findUndeletedCarById(id);
         Long teamId = car.getTeam().getId();
 
-        validateManagePermission(email, teamId);
+        teamService.validateManagePermission(email, teamId);
         validateCarNumberDuplicate(dto.getNumber(), teamId);
 
         String fileUUID = uploadCarImage(dto.getCarImage(), car.getImageUUID());
@@ -69,24 +73,15 @@ public class CarService {
     }
 
     public void updateAvailable(Long id, @Valid UpdateCarAvailableRequestDTO dto, String email) {
-        Car car = carRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new EntityNotFoundException("차량 없음"));
-        validateManagePermission(email, car.getTeam().getId());
+        Car car = findUndeletedCarById(id);
+        teamService.validateManagePermission(email, car.getTeam().getId());
         car.updateAvailable(dto.isAvailable());
     }
 
     public void deleteCar(Long id, String email) {
-        Car car = carRepository.findByIdAndDeletedFalse(id)
-                .orElseThrow(() -> new EntityNotFoundException("차량 없음"));
-        validateManagePermission(email, car.getTeam().getId());
+        Car car = findUndeletedCarById(id);
+        teamService.validateManagePermission(email, car.getTeam().getId());
         car.delete();
-    }
-
-    private void validateManagePermission(String email, Long teamId) {
-        Role role = teamService.getUserRoleOfTeam(email, teamId);
-        if (role != Role.OWNER && role != Role.MANAGER) {
-            throw new RuntimeException("권한이 없습니다.");
-        }
     }
 
     private void validateCarNumberDuplicate(String number, @NotNull Long teamId) {

@@ -80,4 +80,12 @@ public class TeamService {
     public Role getUserRoleOfTeam(String email, Long teamId) {
         return teamRepository.findUserRoleOfTeam(email, teamId);
     }
+
+    @Transactional(readOnly = true)
+    public void validateManagePermission(String email, Long teamId) {
+        Role role = getUserRoleOfTeam(email, teamId);
+        if (role != Role.OWNER && role != Role.MANAGER) {
+            throw new RuntimeException("권한이 없습니다.");
+        }
+    }
 }

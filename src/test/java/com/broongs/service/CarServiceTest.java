@@ -116,7 +116,6 @@ class CarServiceTest {
                 .name("팀1")
                 .deleted(false).build();
         when(teamService.validateAndGetTeam(email, requestDTO.getTeamId())).thenReturn(team);
-        when(teamService.getUserRoleOfTeam(email, requestDTO.getTeamId())).thenReturn(Role.MANAGER);
         when(carRepository.findCarByNumberAndTeamId(requestDTO.getNumber(), team.getId())).thenReturn(Optional.empty());
 
         Car car = Car.addCar(team, requestDTO, null);
@@ -158,14 +157,11 @@ class CarServiceTest {
                 .number(requestDTO.getNumber())
                 .build();
 
-
-        when(teamService.getUserRoleOfTeam(email, requestDTO.getTeamId())).thenReturn(Role.MANAGER);
         when(carRepository.findCarByNumberAndTeamId(requestDTO.getNumber(), team.getId())).thenReturn(Optional.of(duplicatedCar));
 
         // when/then
         assertThrows(RuntimeException.class, () -> carService.addCar(email, requestDTO));
         verifyNoMoreInteractions(carRepository);
-        verifyNoMoreInteractions(teamService);
     }
 
     @Test
@@ -182,7 +178,8 @@ class CarServiceTest {
                 60,
                 null);
 
-        when(teamService.getUserRoleOfTeam(email, requestDTO.getTeamId())).thenReturn(null);
+        doThrow(new RuntimeException("권한이 없습니다."))
+                .when(teamService).validateManagePermission(email, requestDTO.getTeamId());
 
         // when/then
         assertThrows(RuntimeException.class, () -> carService.addCar(email, requestDTO));
@@ -202,7 +199,8 @@ class CarServiceTest {
                 60,
                 null);
 
-        when(teamService.getUserRoleOfTeam(email, requestDTO.getTeamId())).thenReturn(Role.MEMBER);
+        doThrow(new RuntimeException("권한이 없습니다."))
+                .when(teamService).validateManagePermission(email, requestDTO.getTeamId());
 
         // when/then
         assertThrows(RuntimeException.class, () -> carService.addCar(email, requestDTO));
@@ -244,7 +242,6 @@ class CarServiceTest {
                 .build();
 
         when(carRepository.findByIdAndDeletedFalse(carId)).thenReturn(Optional.of(car));
-        when(teamService.getUserRoleOfTeam(email, car.getTeam().getId())).thenReturn(Role.MANAGER);
         when(carRepository.findCarByNumberAndTeamId(requestDTO.getNumber(), car.getTeam().getId())).thenReturn(Optional.empty());
 
         //when
@@ -259,7 +256,7 @@ class CarServiceTest {
     }
 
     @Test
-    @DisplayName("차량 수정 - 실패(권한이 없음)")
+    @DisplayName("차량 수정 - 실패(권한이 없으면 updateCar() 호출 시 RuntimeException이 발생해야 한다)")
     void carUpdate_fail_invalid_role() {
         //given
         Long carId = 1L;
@@ -289,7 +286,8 @@ class CarServiceTest {
                 .imageUUID(null).build();
 
         when(carRepository.findByIdAndDeletedFalse(carId)).thenReturn(Optional.of(car));
-        when(teamService.getUserRoleOfTeam(email, car.getTeam().getId())).thenReturn(Role.MEMBER);
+        doThrow(new RuntimeException("권한이 없습니다."))
+                .when(teamService).validateManagePermission(email, car.getTeam().getId());
 
         //when & then
         assertThrows(RuntimeException.class,
@@ -299,7 +297,7 @@ class CarServiceTest {
     }
 
     @Test
-    @DisplayName("차량 수정 - 실패(수정하려 하는 번호가 중복됨)")
+    @DisplayName("차량 수정 - 실패(수정하려는 차량 번호가 기존에 있는 중복된 번호면 실패해야 한다.)")
     void carUpdate_fail_duplicate_number() {
         //given
         Long carId = 1L;
@@ -329,7 +327,6 @@ class CarServiceTest {
                 .imageUUID(null).build();
 
         when(carRepository.findByIdAndDeletedFalse(carId)).thenReturn(Optional.of(car));
-        when(teamService.getUserRoleOfTeam(email, car.getTeam().getId())).thenReturn(Role.MANAGER);
         when(carRepository.findCarByNumberAndTeamId(requestDTO.getNumber(), car.getTeam().getId()))
                 .thenReturn(Optional.of(mock(Car.class)));
 
@@ -337,7 +334,6 @@ class CarServiceTest {
         assertThrows(RuntimeException.class,
                 () -> carService.updateCar(carId, email, requestDTO));
 
-        verifyNoMoreInteractions(teamService);
         verifyNoMoreInteractions(carRepository);
     }
 
@@ -363,7 +359,6 @@ class CarServiceTest {
                 .imageUUID(null).build();
 
 
-        when(teamService.getUserRoleOfTeam(email, car.getTeam().getId())).thenReturn(Role.MANAGER);
         when(carRepository.findByIdAndDeletedFalse(carId)).thenReturn(Optional.of(car));
 
         //when
@@ -395,8 +390,9 @@ class CarServiceTest {
                 .imageUUID(null).build();
 
 
-        when(teamService.getUserRoleOfTeam(email, car.getTeam().getId())).thenReturn(Role.MEMBER);
         when(carRepository.findByIdAndDeletedFalse(carId)).thenReturn(Optional.of(car));
+        doThrow(new RuntimeException("권한이 없습니다."))
+                .when(teamService).validateManagePermission(email, car.getTeam().getId());
 
         //when & then
         assertThrows(RuntimeException.class, () -> carService.deleteCar(carId, email));
@@ -429,7 +425,6 @@ class CarServiceTest {
         UpdateCarAvailableRequestDTO dto = new UpdateCarAvailableRequestDTO(false);
 
 
-        when(teamService.getUserRoleOfTeam(email, car.getTeam().getId())).thenReturn(Role.MANAGER);
         when(carRepository.findByIdAndDeletedFalse(carId)).thenReturn(Optional.of(car));
 
         //when
@@ -464,7 +459,8 @@ class CarServiceTest {
         UpdateCarAvailableRequestDTO dto = new UpdateCarAvailableRequestDTO(false);
 
 
-        when(teamService.getUserRoleOfTeam(email, car.getTeam().getId())).thenReturn(Role.MEMBER);
+        doThrow(new RuntimeException("권한이 없습니다."))
+                .when(teamService).validateManagePermission(email, car.getTeam().getId());
         when(carRepository.findByIdAndDeletedFalse(carId)).thenReturn(Optional.of(car));
 
         //when & then
