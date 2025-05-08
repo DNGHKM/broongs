@@ -23,6 +23,7 @@ public class TeamService {
     private final UserTeamRepository userTeamRepository;
     private final UserService userService;
 
+    @Transactional(readOnly = true)
     public List<UserTeamListResponseDTO> getUserTeamList(String username) {
         User user = userService.findUserByEmail(username);
         return teamRepository.getUserTeamList(user.getId()).stream()
@@ -69,11 +70,13 @@ public class TeamService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Team validateAndGetTeam(String email, Long teamId) {
         return teamRepository.findAccessibleTeam(email, teamId)
                 .orElseThrow(() -> new EntityNotFoundException("권한이 존재하지 않거나 팀이 없습니다."));
     }
 
+    @Transactional(readOnly = true)
     public Role getUserRoleOfTeam(String email, Long teamId) {
         return teamRepository.findUserRoleOfTeam(email, teamId);
     }

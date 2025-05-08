@@ -26,6 +26,7 @@ public class CarService {
     private final CarRepository carRepository;
     private final String FILE_DIR = "/car";
 
+    @Transactional(readOnly = true)
     public CarInfoResponseDTO getCarInfo(String email, Long id) {
         Car car = carRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new EntityNotFoundException("차량 정보 조회 불가능"));
@@ -59,6 +60,7 @@ public class CarService {
         return UpdateCarResponseDTO.from(car);
     }
 
+    @Transactional(readOnly = true)
     public List<CarListResponseDTO> getCarListByTeam(Long teamId, String email) {
         Team team = teamService.validateAndGetTeam(email, teamId);
         return carRepository.findCarsByTeam(team).stream()
