@@ -16,7 +16,7 @@ public class CarInfoResponseDTO {
     private String imageUUID;
     private boolean available;
 
-    public static CarInfoResponseDTO from(Car car){
+    public static CarInfoResponseDTO from(Car car) {
         return new CarInfoResponseDTO(car.getId(),
                 car.getNumber(),
                 car.getModel(),

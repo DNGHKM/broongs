@@ -3,7 +3,6 @@ package com.broongs.service;
 import com.broongs.dto.car.*;
 import com.broongs.entity.Car;
 import com.broongs.entity.Team;
-import com.broongs.enums.Role;
 import com.broongs.repository.CarRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -428,7 +427,7 @@ class CarServiceTest {
         when(carRepository.findByIdAndDeletedFalse(carId)).thenReturn(Optional.of(car));
 
         //when
-        carService.updateAvailable(carId, dto, email);
+        carService.validateManageCar(carId, dto, email);
 
         //then
         assertFalse(car.isAvailable());
@@ -464,7 +463,7 @@ class CarServiceTest {
         when(carRepository.findByIdAndDeletedFalse(carId)).thenReturn(Optional.of(car));
 
         //when & then
-        assertThrows(RuntimeException.class, () -> carService.updateAvailable(carId, dto, email));
+        assertThrows(RuntimeException.class, () -> carService.validateManageCar(carId, dto, email));
         assertTrue(car.isAvailable());
     }
 

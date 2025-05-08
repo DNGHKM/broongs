@@ -72,11 +72,19 @@ public class CarService {
                 .collect(Collectors.toList());
     }
 
-    public void updateAvailable(Long id, @Valid UpdateCarAvailableRequestDTO dto, String email) {
+    @Transactional(readOnly = true)
+    public void validateManageCar(Long id, @Valid UpdateCarAvailableRequestDTO dto, String email) {
         Car car = findUndeletedCarById(id);
         teamService.validateManagePermission(email, car.getTeam().getId());
         car.updateAvailable(dto.isAvailable());
     }
+
+    @Transactional(readOnly = true)
+    public void validateAccessCar(Long carId, String email) {
+        Car car = findUndeletedCarById(carId);
+        teamService.validateAccessToTeam(email, car.getTeam().getId());
+    }
+
 
     public void deleteCar(Long id, String email) {
         Car car = findUndeletedCarById(id);

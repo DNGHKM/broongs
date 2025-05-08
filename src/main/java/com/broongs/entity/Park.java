@@ -1,5 +1,6 @@
 package com.broongs.entity;
 
+import com.broongs.dto.parking.ParkingRequestDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,5 +37,16 @@ public class Park {
     private String imageUUID;
 
     protected Park() {
+    }
+
+    public static Park parking(User user, Car car, ParkingRequestDTO dto, String imageUUID) {
+        return Park.builder()
+                .user(user)
+                .car(car)
+                .comment(dto.getComment())
+                .location(dto.getLocation())
+                .time(dto.getTime())
+                .imageUUID(imageUUID)
+                .build();
     }
 }

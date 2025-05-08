@@ -64,6 +64,7 @@ public class TeamService {
         return UpdateTeamResponseDTO.from(team);
     }
 
+    @Transactional(readOnly = true)
     public void validateAccessToTeam(String email, Long teamId) {
         if (!teamRepository.existsByUserEmailAndTeamId(email, teamId)) {
             throw new RuntimeException("팀 접근 권한이 없습니다.");

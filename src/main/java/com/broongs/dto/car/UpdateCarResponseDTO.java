@@ -11,7 +11,7 @@ public class UpdateCarResponseDTO {
     private String number;
     private String teamName;
 
-    public static UpdateCarResponseDTO from(Car car){
+    public static UpdateCarResponseDTO from(Car car) {
         return new UpdateCarResponseDTO(car.getId(), car.getNumber(), car.getTeam().getName());
     }
 }
