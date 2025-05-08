@@ -6,6 +6,7 @@ import com.broongs.entity.Team;
 import com.broongs.enums.Role;
 import com.broongs.repository.CarRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -63,6 +64,13 @@ public class CarService {
         return carRepository.findCarsByTeam(team).stream()
                 .map(car -> CarListResponseDTO.from(car, teamId))
                 .collect(Collectors.toList());
+    }
+
+    public void updateAvailable(Long id, @Valid UpdateCarAvailableRequestDTO dto, String email) {
+        Car car = carRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new EntityNotFoundException("차량 없음"));
+        validateManagePermission(email, car.getTeam().getId());
+        car.updateAvailable(dto.isAvailable());
     }
 
     public void deleteCar(Long id, String email) {

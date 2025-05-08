@@ -75,8 +75,9 @@ public class Car {
         this.updateAt = LocalDateTime.now();
     }
 
-    public void disabled() {
-        this.available = false;
+    public void updateAvailable(boolean isAvailable) {
+        this.available = isAvailable;
+        this.updateAt = LocalDateTime.now();
     }
 
     public void delete() {

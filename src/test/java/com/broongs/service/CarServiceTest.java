@@ -1,9 +1,6 @@
 package com.broongs.service;
 
-import com.broongs.dto.car.AddCarRequestDTO;
-import com.broongs.dto.car.AddCarResponseDTO;
-import com.broongs.dto.car.CarInfoResponseDTO;
-import com.broongs.dto.car.UpdateCarRequestDTO;
+import com.broongs.dto.car.*;
 import com.broongs.entity.Car;
 import com.broongs.entity.Team;
 import com.broongs.enums.Role;
@@ -405,4 +402,75 @@ class CarServiceTest {
         assertThrows(RuntimeException.class, () -> carService.deleteCar(carId, email));
         assertFalse(car.isDeleted());
     }
+
+    @Test
+    @DisplayName("차량 가용상태 변경 - 성공")
+    void updateAvailableCar_success() {
+        //given
+        Long carId = 1L;
+        String email = "test@test.com";
+        Team team = Team.builder()
+                .id(1L)
+                .name("팀1")
+                .build();
+
+        Car car = Car.builder()
+                .team(team)
+                .id(carId)
+                .number("111가1111")
+                .model("모델1")
+                .color("색상1")
+                .mileage(1L)
+                .fuelLevel(1)
+                .imageUUID(null)
+                .available(true)
+                .build();
+
+        UpdateCarAvailableRequestDTO dto = new UpdateCarAvailableRequestDTO(false);
+
+
+        when(teamService.getUserRoleOfTeam(email, car.getTeam().getId())).thenReturn(Role.MANAGER);
+        when(carRepository.findByIdAndDeletedFalse(carId)).thenReturn(Optional.of(car));
+
+        //when
+        carService.updateAvailable(carId, dto, email);
+
+        //then
+        assertFalse(car.isAvailable());
+    }
+
+    @Test
+    @DisplayName("차량 가용상태 변경 - 실패(권한없음)")
+    void updateAvailableCar_fail_invalid_role() {
+        Long carId = 1L;
+        String email = "test@test.com";
+        Team team = Team.builder()
+                .id(1L)
+                .name("팀1")
+                .build();
+
+        Car car = Car.builder()
+                .team(team)
+                .id(carId)
+                .number("111가1111")
+                .model("모델1")
+                .color("색상1")
+                .mileage(1L)
+                .fuelLevel(1)
+                .imageUUID(null)
+                .available(true)
+                .build();
+
+        UpdateCarAvailableRequestDTO dto = new UpdateCarAvailableRequestDTO(false);
+
+
+        when(teamService.getUserRoleOfTeam(email, car.getTeam().getId())).thenReturn(Role.MEMBER);
+        when(carRepository.findByIdAndDeletedFalse(carId)).thenReturn(Optional.of(car));
+
+        //when & then
+        assertThrows(RuntimeException.class, () -> carService.updateAvailable(carId, dto, email));
+        assertTrue(car.isAvailable());
+    }
+
+
 }

@@ -27,12 +27,12 @@ public class CarController {
             CarInfoResponseDTO carInfoDTO = carService.getCarInfo(userDetails.getUsername(), id);
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(ApiResponse.success("차량을 조회하였습니다.", carInfoDTO));
+                    .body(ApiResponse.success("차량을 조회하였습니다. ", carInfoDTO));
         } catch (Exception e) {
             log.error("error = {}", e.getMessage());
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.failure("차량 조회에 실패하였습니다." + e.getMessage()));
+                    .body(ApiResponse.failure("차량 조회에 실패하였습니다. " + e.getMessage()));
         }
     }
 
@@ -43,12 +43,12 @@ public class CarController {
             AddCarResponseDTO addCarResponseDTO = carService.addCar(userDetails.getUsername(), dto);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(ApiResponse.success("차량을 등록하였습니다.", addCarResponseDTO));
+                    .body(ApiResponse.success("차량을 등록하였습니다. ", addCarResponseDTO));
         } catch (Exception e) {
             log.error("error = {}", e.getMessage());
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.failure("차량 등록에 실패하였습니다." + e.getMessage()));
+                    .body(ApiResponse.failure("차량 등록에 실패하였습니다. " + e.getMessage()));
         }
     }
 
@@ -60,12 +60,29 @@ public class CarController {
             UpdateCarResponseDTO updateCarResponseDTO = carService.updateCar(id, userDetails.getUsername(), dto);
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(ApiResponse.success("차량을 수정하였습니다.", updateCarResponseDTO));
+                    .body(ApiResponse.success("차량을 수정하였습니다. ", updateCarResponseDTO));
         } catch (Exception e) {
             log.error("error = {}", e.getMessage());
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.failure("차량 수정에 실패하였습니다." + e.getMessage()));
+                    .body(ApiResponse.failure("차량 수정에 실패하였습니다. " + e.getMessage()));
+        }
+    }
+
+    @PatchMapping(value = "/{id}/available")
+    public ResponseEntity<ApiResponse> updateCarAvailability(@PathVariable Long id,
+                                                 @RequestBody @Valid UpdateCarAvailableRequestDTO dto,
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
+        try {
+            carService.updateAvailable(id, dto, userDetails.getUsername());
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(ApiResponse.success("차량 사용가능 상태를 업데이트 하였습니다. ", id));
+        } catch (Exception e) {
+            log.error("error = {}", e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.failure("차량 사용 가능 상태 변경 실패 " + e.getMessage()));
         }
     }
     @DeleteMapping(value = "/{id}")
@@ -75,13 +92,12 @@ public class CarController {
             carService.deleteCar(id, userDetails.getUsername());
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(ApiResponse.success("차량을 삭제하였습니다.", id));
+                    .body(ApiResponse.success("차량을 삭제하였습니다. ", id));
         } catch (Exception e) {
             log.error("error = {}", e.getMessage());
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.failure("차량 삭제를 실패하였습니다." + e.getMessage()));
+                    .body(ApiResponse.failure("차량 삭제를 실패하였습니다. " + e.getMessage()));
         }
     }
-    //TODO 비활성화 구현
 }
