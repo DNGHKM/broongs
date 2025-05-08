@@ -42,6 +42,9 @@ public class User {
 
     private LocalDateTime updateAt;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean deleted;
+
     protected User() {
     }
 

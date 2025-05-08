@@ -35,6 +35,6 @@ public class Park {
     @Column(name = "img_uuid", length = 50)
     private String imageUUID;
 
-    public Park() {
+    protected Park() {
     }
 }
